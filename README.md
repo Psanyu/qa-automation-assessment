@@ -1,5 +1,7 @@
 # QA Automation Technical Assessment
 
+# Report :: https://cheery-druid-9fcecd.netlify.app               Code: https://github.com/Psanyu/qa-automation-assessment
+
 ## Overview
 
 I was provided with a mock data quality application. The task was to write automated tests against it using **Playwright with Python (sync API)** and **pytest**. The repository and details below reflect this attempt.
