@@ -1,6 +1,7 @@
 # QA Automation Technical Assessment
 
-# Report :: https://cheery-druid-9fcecd.netlify.app               Code: https://github.com/Psanyu/qa-automation-assessment
+# Report :: https://cheery-druid-9fcecd.netlify.app               
+# Code: https://github.com/Psanyu/qa-automation-assessment
 
 ## Overview
 
