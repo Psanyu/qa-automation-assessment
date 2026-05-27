@@ -1,0 +1,6 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","66","test_all_original_rows_contain_sfid[chromium]","","2026-05-27","passed","2026-05-27","","test_data_issues","",""
+"","784","test_selecting_original_on_7th_card_updates_final_row[chromium]","","2026-05-27","passed","2026-05-27","","test_data_issues","",""
+"","9","test_data_issues_grid_loads_10_records[chromium]","","2026-05-27","passed","2026-05-27","","test_data_issues","",""
+"","1745","test_inline_edit_on_final_row_persists_value[chromium]","","2026-05-27","passed","2026-05-27","","test_data_issues","",""
+"","1500","test_selection_counter_reflects_checkbox_state[chromium]","","2026-05-27","passed","2026-05-27","","test_data_issues","",""
