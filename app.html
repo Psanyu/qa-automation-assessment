@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GenericCRM App</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+  :root {
+    --primary: #0070D2;
+    --primary-dark: #032D60;
+    --success: #2E844A;
+    --warning: #FF6B35;
+    --error: #C23934;
+    --issue-color: #795548;
+    --bg: #F4F6F9;
+    --card-bg: #FFFFFF;
+    --text: #181818;
+    --text-secondary: #706E6B;
+    --border: #DDDBDA;
+    --hover: #F3F3F3;
+    --row-highlight: rgba(121, 85, 72, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  
+  .app-shell {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  
+  .app-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    min-height: 44px;
+  }
+  .app-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .app-toolbar h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-dark);
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .breadcrumb a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  .breadcrumb .sep { color: var(--border); }
+
+  .app-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text);
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--hover); }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .btn-primary:hover { background: #005FB2; }
+
+  .btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  .btn-icon {
+    padding: 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-icon:hover { background: var(--hover); color: var(--text); }
+
+  
+  .page-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .home-grid.full { grid-template-columns: 1fr; }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-header h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-dark);
+  }
+  .card-body { padding: 16px; }
+
+  
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-card .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-card .stat-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+  .stat-card.warning .stat-value { color: var(--warning); }
+  .stat-card.error .stat-value { color: var(--error); }
+  .stat-card.success .stat-value { color: var(--success); }
+
+  
+  .chart-container {
+    position: relative;
+    height: 250px;
+  }
+
+  
+  .issues-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+  }
+  .issues-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .issues-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  
+
+  
+  .issue-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-top: none;
+    position: relative;
+  }
+  .issue-card:last-child {
+    border-radius: 0 0 8px 8px;
+  }
+
+  
+  .issue-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid #F0F0F0;
+    background: #FAFAFA;
+  }
+  .issue-card-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  
+  .checkbox-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .checkbox-wrap input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--primary);
+  }
+
+  
+  .object-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-dark);
+  }
+
+  
+  .rule-name {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  
+  .issue-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .issue-chip.formatting {
+    background: rgba(121, 85, 72, 0.12);
+    color: var(--issue-color);
+  }
+  .issue-chip.missing {
+    background: rgba(194, 57, 52, 0.12);
+    color: var(--error);
+  }
+  .issue-chip.duplicate {
+    background: rgba(255, 107, 53, 0.12);
+    color: var(--warning);
+  }
+  .issue-chip.invalid {
+    background: rgba(0, 112, 210, 0.12);
+    color: var(--primary);
+  }
+
+  
+  .issue-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .issue-table th {
+    text-align: left;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid var(--border);
+    background: #FAFAFA;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .issue-table th:first-child {
+    width: 80px;
+  }
+  .issue-table td {
+    padding: 6px 10px;
+    font-size: 13px;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #F5F5F5;
+  }
+
+  
+  .issue-table tr[data-row-type="original"] td {
+    background: white;
+  }
+  .issue-table tr[data-row-type="suggested"] td {
+    background: #FAFFFE;
+  }
+  .issue-table tr[data-row-type="final"] td {
+    background: white;
+  }
+
+  
+  .row-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  
+  .cell-issue {
+    background: var(--row-highlight) !important;
+    color: var(--issue-color);
+    font-weight: 500;
+  }
+
+  
+  .cell-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .cell-radio input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--issue-color);
+    cursor: pointer;
+  }
+
+  
+  .cell-editable {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    border-bottom: 1px dashed var(--text-secondary);
+    padding-bottom: 2px;
+  }
+  .cell-editable svg {
+    width: 14px;
+    height: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+
+  .cell-spinner {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .cell-spinner::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .grid-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 0;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .grid-loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .grid-loading-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  
+  
+
+  
+
+  
+  .tooltip-trigger {
+    position: relative;
+    display: inline-flex;
+    cursor: help;
+  }
+  .tooltip-trigger .tooltip-content {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-dark);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 200;
+  }
+  .tooltip-trigger:hover .tooltip-content { opacity: 1; }
+
+  
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--error);
+    color: white;
+  }
+
+  
+
+  
+
+  
+
+  
+  .page { display: none; }
+  .page.active { display: block; }
+
+  
+  .inline-edit-input {
+    border: 1px solid var(--primary);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    width: 100%;
+    box-shadow: 0 0 0 2px rgba(0,112,210,0.2);
+  }
+
+  
+  .confirm-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #EEF4FF;
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+  .confirm-bar.visible { display: flex; }
+  .confirm-bar-text {
+    font-size: 13px;
+    color: var(--primary-dark);
+    font-weight: 500;
+  }
+
+  
+
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  
+  <div class="app-toolbar" role="toolbar" aria-label="Application toolbar">
+    <div class="app-toolbar-left">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="#" id="nav-home" role="link">Home</a>
+        <span class="sep" aria-hidden="true">/</span>
+        <span id="breadcrumb-current" aria-current="page">Dashboard</span>
+      </nav>
+    </div>
+    <div class="app-toolbar-right"></div>
+  </div>
+
+  
+  <div class="page-container">
+
+    
+    <div class="page active" id="page-home" role="region" aria-label="Dashboard">
+
+      
+      <div class="stat-row" role="list" aria-label="Summary statistics">
+        <div class="stat-card" role="listitem">
+          <div class="stat-value">47</div>
+          <div class="stat-label">Total Issues</div>
+        </div>
+        <div class="stat-card warning" role="listitem">
+          <div class="stat-value">12</div>
+          <div class="stat-label">Critical</div>
+        </div>
+        <div class="stat-card success" role="listitem">
+          <div class="stat-value">23</div>
+          <div class="stat-label">Auto-Fixed</div>
+        </div>
+        <div class="stat-card" role="listitem">
+          <div class="stat-value">89%</div>
+          <div class="stat-label">Data Health</div>
+        </div>
+      </div>
+
+      <div class="home-grid">
+        
+        <div class="card">
+          <div class="card-header">
+            <h2>Issues by Category</h2>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" role="img" aria-label="Bar chart showing issues by category">
+              <svg viewBox="0 0 500 220" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                
+                <line x1="60" y1="20" x2="60" y2="180" stroke="#DDDBDA" stroke-width="1"/>
+                <line x1="60" y1="180" x2="480" y2="180" stroke="#DDDBDA" stroke-width="1"/>
+                <line x1="60" y1="140" x2="480" y2="140" stroke="#F0F0F0" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="60" y1="100" x2="480" y2="100" stroke="#F0F0F0" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="60" y1="60" x2="480" y2="60" stroke="#F0F0F0" stroke-width="1" stroke-dasharray="4"/>
+
+                
+                <text x="52" y="184" text-anchor="end" font-size="10" fill="#706E6B">0</text>
+                <text x="52" y="144" text-anchor="end" font-size="10" fill="#706E6B">10</text>
+                <text x="52" y="104" text-anchor="end" font-size="10" fill="#706E6B">20</text>
+                <text x="52" y="64" text-anchor="end" font-size="10" fill="#706E6B">30</text>
+
+                
+                <g role="listitem" aria-label="Formatting: 18 issues">
+                  <rect x="80" y="72" width="60" height="108" rx="3" fill="#795548" opacity="0.85">
+                    <title>Formatting: 18</title>
+                  </rect>
+                  <text x="110" y="200" text-anchor="middle" font-size="10" fill="#706E6B">Formatting</text>
+                  <text x="110" y="66" text-anchor="middle" font-size="11" font-weight="600" fill="#795548">18</text>
+                </g>
+                <g role="listitem" aria-label="Missing Data: 12 issues">
+                  <rect x="170" y="108" width="60" height="72" rx="3" fill="#C23934" opacity="0.85">
+                    <title>Missing Data: 12</title>
+                  </rect>
+                  <text x="200" y="200" text-anchor="middle" font-size="10" fill="#706E6B">Missing</text>
+                  <text x="200" y="102" text-anchor="middle" font-size="11" font-weight="600" fill="#C23934">12</text>
+                </g>
+                <g role="listitem" aria-label="Duplicates: 9 issues">
+                  <rect x="260" y="126" width="60" height="54" rx="3" fill="#FF6B35" opacity="0.85">
+                    <title>Duplicates: 9</title>
+                  </rect>
+                  <text x="290" y="200" text-anchor="middle" font-size="10" fill="#706E6B">Duplicates</text>
+                  <text x="290" y="120" text-anchor="middle" font-size="11" font-weight="600" fill="#FF6B35">9</text>
+                </g>
+                <g role="listitem" aria-label="Invalid: 5 issues">
+                  <rect x="350" y="150" width="60" height="30" rx="3" fill="#0070D2" opacity="0.85">
+                    <title>Invalid: 5</title>
+                  </rect>
+                  <text x="380" y="200" text-anchor="middle" font-size="10" fill="#706E6B">Invalid</text>
+                  <text x="380" y="144" text-anchor="middle" font-size="11" font-weight="600" fill="#0070D2">5</text>
+                </g>
+                <g role="listitem" aria-label="Standardization: 3 issues">
+                  <rect x="440" y="162" width="60" height="18" rx="3" fill="#2E844A" opacity="0.85">
+                    <title>Standardization: 3</title>
+                  </rect>
+                  <text x="470" y="200" text-anchor="middle" font-size="10" fill="#706E6B">Standard.</text>
+                  <text x="470" y="156" text-anchor="middle" font-size="11" font-weight="600" fill="#2E844A">3</text>
+                </g>
+
+                
+                <foreignObject x="0" y="205" width="500" height="20">
+                  <div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;justify-content:center;">
+                    <span style="font-size:10px;color:#706E6B;">Data collected from 3 objects across 1,247 records</span>
+                  </div>
+                </foreignObject>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="card">
+          <div class="card-header">
+            <h2>Recent Activity</h2>
+
+          </div>
+          <div class="card-body" style="padding:0;">
+            <table role="table" aria-label="Recent activity" style="width:100%;border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th style="padding:8px 12px;text-align:left;font-size:11px;color:#706E6B;font-weight:600;border-bottom:1px solid #DDDBDA;">Action</th>
+                  <th style="padding:8px 12px;text-align:left;font-size:11px;color:#706E6B;font-weight:600;border-bottom:1px solid #DDDBDA;">Object</th>
+                  <th style="padding:8px 12px;text-align:left;font-size:11px;color:#706E6B;font-weight:600;border-bottom:1px solid #DDDBDA;">Records</th>
+                  <th style="padding:8px 12px;text-align:left;font-size:11px;color:#706E6B;font-weight:600;border-bottom:1px solid #DDDBDA;">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;">
+                    <span style="display:inline-flex;align-items:center;gap:4px;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#2E844A"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                      Auto-fix applied
+                    </span>
+                  </td>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;">Lead</td>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;">23</td>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;color:#706E6B;">2 min ago</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;">
+                    <span style="display:inline-flex;align-items:center;gap:4px;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#0070D2"><path d="M11 7h2v2h-2V7zm0 4h2v6h-2v-6zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                      Scan completed
+                    </span>
+                  </td>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;">Account</td>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;">1,247</td>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;color:#706E6B;">15 min ago</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;">
+                    <span style="display:inline-flex;align-items:center;gap:4px;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF6B35"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                      New issues found
+                    </span>
+                  </td>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;">Contact</td>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;">8</td>
+                  <td style="padding:8px 12px;font-size:13px;border-bottom:1px solid #F5F5F5;color:#706E6B;">1 hr ago</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 12px;font-size:13px;">
+                    <span style="display:inline-flex;align-items:center;gap:4px;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="#C23934"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+                      Rule disabled
+                    </span>
+                  </td>
+                  <td style="padding:8px 12px;font-size:13px;">Lead</td>
+                  <td style="padding:8px 12px;font-size:13px;">—</td>
+                  <td style="padding:8px 12px;font-size:13px;color:#706E6B;">3 hrs ago</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      
+      <div style="text-align:center; margin-top:8px;">
+        <button class="btn btn-primary" id="solveBtn" style="padding:10px 32px;font-size:14px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 5.6L5 7l1.4-2.5L5 2l2.5 1.4L10 2 8.6 4.5 10 7 7.5 5.6zm14 9.8L22 14l-1.4 2.5L22 19l-2.5-1.4L17 19l1.4-2.5L17 14l2.5 1.4zM22 2l-1.4 2.5L22 7l-2.5-1.4L17 7l1.4-2.5L17 2l2.5 1.4L22 2zm-8.66 10.78l2.44-2.44-2.12-2.12-2.44 2.44 2.12 2.12zm1.03-5.49l2.34 2.34c.39.37.39 1.02 0 1.41L5.04 22.71c-.39.39-1.04.39-1.41 0l-2.34-2.34c-.39-.39-.39-1.04 0-1.41L12.96 7.29c.39-.39 1.04-.39 1.41 0z"/></svg>
+          Review &amp; Fix Issues
+        </button>
+      </div>
+    </div>
+
+    
+    <div class="page" id="page-issues" role="region" aria-label="Data Issues">
+
+      
+      <div class="confirm-bar" id="confirmBar" role="alert">
+        <span class="confirm-bar-text"><span id="selectedCount">0</span> issue(s) selected</span>
+      </div>
+
+      
+      <div class="issues-toolbar">
+        <div class="issues-toolbar-left">
+          <div class="checkbox-wrap">
+            <input type="checkbox" id="selectAll" aria-label="Select all issues">
+          </div>
+          <span style="font-size:13px;font-weight:600;color:var(--primary-dark);">Data Issues</span>
+          <span class="badge" aria-label="10 issues">10</span>
+
+          
+
+        </div>
+      </div>
+
+      <div id="issueCardsContainer" role="list" aria-label="Data issue records">
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+const MOCK_DATA = [
+  {
+    id: '00Qak00000RHtuzEAD', object: 'Lead', rule: 'Address Formatting (Lead)',
+    issueType: 'formatting', issueLabel: 'Formatting Issues',
+    columns: ['City','State/Province','Country','Phone','Zip/Postal Code','Street'],
+    issueColumn: 'Street',
+    original: ['Vancouver','BC','CA','','v4vzp5','apt. 405, 3550 woodsdale road,'],
+    suggested: ['Vancouver','BC','CA','','v4vzp5','Apt. 405, 3550 Woodsdale Rd,'],
+    final: ['Vancouver','BC','CA','','v4vzp5','Apt. 405, 3550 Woodsdale Rd,'],
+    selectedRow: 'suggested'
+  },
+  {
+    id: '00Qak00000TK92mEAD', object: 'Lead', rule: 'Phone Standardization (Lead)',
+    issueType: 'formatting', issueLabel: 'Formatting Issues',
+    columns: ['First Name','Last Name','Company','Phone','Email','City'],
+    issueColumn: 'Phone',
+    original: ['Sarah','Chen','Nexus Corp','6045551234','schen@nexus.io','Burnaby'],
+    suggested: ['Sarah','Chen','Nexus Corp','(604) 555-1234','schen@nexus.io','Burnaby'],
+    final: ['Sarah','Chen','Nexus Corp','(604) 555-1234','schen@nexus.io','Burnaby'],
+    selectedRow: 'suggested'
+  },
+  {
+    id: '003ak00000ABcdEFG', object: 'Lead', rule: 'Missing Required Fields (Lead)',
+    issueType: 'missing', issueLabel: 'Missing Data',
+    columns: ['First Name','Last Name','Company','Phone','Email','City'],
+    issueColumn: 'Email',
+    original: ['James','Rodriguez','','(778) 555-8901','','Surrey'],
+    suggested: ['James','Rodriguez','','(778) 555-8901','','Surrey'],
+    final: ['James','Rodriguez','','(778) 555-8901','','Surrey'],
+    selectedRow: 'original'
+  },
+  {
+    id: '00Qak00000XY789AB', object: 'Lead', rule: 'Address Formatting (Lead)',
+    issueType: 'formatting', issueLabel: 'Formatting Issues',
+    columns: ['City','State/Province','Country','Phone','Zip/Postal Code','Street'],
+    issueColumn: 'Street',
+    original: ['Toronto','ON','CA','(416) 555-0199','m5v3l9','123 king street west, suite 200'],
+    suggested: ['Toronto','ON','CA','(416) 555-0199','m5v3l9','123 King St W, Suite 200'],
+    final: ['Toronto','ON','CA','(416) 555-0199','m5v3l9','123 King St W, Suite 200'],
+    selectedRow: 'suggested'
+  },
+  {
+    id: '00Qak00000MN456CD', object: 'Lead', rule: 'Country Code Standardization (Lead)',
+    issueType: 'invalid', issueLabel: 'Invalid Format',
+    columns: ['First Name','Last Name','Country','State/Province','City','Zip/Postal Code'],
+    issueColumn: 'Country',
+    original: ['Amit','Patel','Canada','AB','Calgary','T2P 1J9'],
+    suggested: ['Amit','Patel','CA','AB','Calgary','T2P 1J9'],
+    final: ['Amit','Patel','CA','AB','Calgary','T2P 1J9'],
+    selectedRow: 'suggested'
+  },
+  {
+    id: '003ak00000QR123ST', object: 'Lead', rule: 'Missing Required Fields (Lead)',
+    issueType: 'missing', issueLabel: 'Missing Data',
+    columns: ['First Name','Last Name','Company','Phone','Email','Street'],
+    issueColumn: 'Company',
+    original: ['Lisa','Nakamura','','(250) 555-3344','lnakamura@gmail.com','890 Cedar Ave'],
+    suggested: ['Lisa','Nakamura','','(250) 555-3344','lnakamura@gmail.com','890 Cedar Ave'],
+    final: ['Lisa','Nakamura','','(250) 555-3344','lnakamura@gmail.com','890 Cedar Ave'],
+    selectedRow: 'original'
+  },
+  {
+    id: '00Qak00000UV789WX', object: 'Lead', rule: 'Phone Standardization (Lead)',
+    issueType: 'formatting', issueLabel: 'Formatting Issues',
+    columns: ['First Name','Last Name','Company','Phone','Email','City'],
+    issueColumn: 'Phone',
+    original: ['Michael','O\'Brien','CloudSync','778.555.6677','mobrien@cloudsync.ca','Victoria'],
+    suggested: ['Michael','O\'Brien','CloudSync','(778) 555-6677','mobrien@cloudsync.ca','Victoria'],
+    final: ['Michael','O\'Brien','CloudSync','(778) 555-6677','mobrien@cloudsync.ca','Victoria'],
+    selectedRow: 'suggested'
+  },
+  {
+    id: '00Qak00000EF012GH', object: 'Lead', rule: 'Postal Code Formatting (Lead)',
+    issueType: 'formatting', issueLabel: 'Formatting Issues',
+    columns: ['City','State/Province','Country','Phone','Zip/Postal Code','Street'],
+    issueColumn: 'Zip/Postal Code',
+    original: ['Edmonton','AB','CA','(780) 555-2211','t5j0n3','456 Jasper Ave NW'],
+    suggested: ['Edmonton','AB','CA','(780) 555-2211','T5J 0N3','456 Jasper Ave NW'],
+    final: ['Edmonton','AB','CA','(780) 555-2211','T5J 0N3','456 Jasper Ave NW'],
+    selectedRow: 'suggested'
+  },
+  {
+    id: '003ak00000IJ345KL', object: 'Lead', rule: 'State Abbreviation (Lead)',
+    issueType: 'invalid', issueLabel: 'Invalid Format',
+    columns: ['First Name','Last Name','City','State/Province','Country','Zip/Postal Code'],
+    issueColumn: 'State/Province',
+    original: ['Rachel','Kim','Winnipeg','Manitoba','CA','R3C 4A5'],
+    suggested: ['Rachel','Kim','Winnipeg','MB','CA','R3C 4A5'],
+    final: ['Rachel','Kim','Winnipeg','MB','CA','R3C 4A5'],
+    selectedRow: 'suggested'
+  },
+  {
+    id: '00Qak00000PQ678RS', object: 'Lead', rule: 'Name Casing (Lead)',
+    issueType: 'formatting', issueLabel: 'Formatting Issues',
+    columns: ['First Name','Last Name','Company','Phone','Email','City'],
+    issueColumn: 'Last Name',
+    original: ['david','MCDONALD','Apex Industries','(604) 555-9900','dmcdonald@apex.io','Vancouver'],
+    suggested: ['David','McDonald','Apex Industries','(604) 555-9900','dmcdonald@apex.io','Vancouver'],
+    final: ['David','McDonald','Apex Industries','(604) 555-9900','dmcdonald@apex.io','Vancouver'],
+    selectedRow: 'suggested'
+  }
+];
+
+let selectedIssues = new Set();
+
+function renderIssueCards() {
+  const container = document.getElementById('issueCardsContainer');
+  container.innerHTML = '';
+
+  MOCK_DATA.forEach((issue, idx) => {
+    const card = document.createElement('div');
+    card.className = 'issue-card';
+    card.setAttribute('role', 'listitem');
+
+    if (idx % 3 === 0) {
+      card.setAttribute('data-testid', 'issue_grid');
+    }
+    card.setAttribute('data-record-id', issue.id);
+
+    const issueColIdx = issue.columns.indexOf(issue.issueColumn);
+
+    card.innerHTML = `
+      
+      <div class="issue-card-header">
+        <div class="issue-card-header-left">
+          <div class="checkbox-wrap">
+            <input type="checkbox"
+              aria-label="Select issue for ${issue.id}"
+              data-issue-id="${issue.id}"
+              class="issue-checkbox"
+              ${selectedIssues.has(issue.id) ? 'checked' : ''}>
+          </div>
+          <span class="object-badge">${issue.object}</span>
+          <span aria-hidden="true" style="color:var(--border);">|</span>
+          <span class="tooltip-trigger">
+            <button class="btn-icon" aria-label="Issue details for ${issue.id}" style="padding:2px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11 7h2v2h-2V7zm0 4h2v6h-2v-6zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+            </button>
+            <span class="tooltip-content" role="tooltip">${issue.rule}</span>
+          </span>
+          <span aria-hidden="true" style="color:var(--border);">|</span>
+          <span class="rule-name">${issue.rule}</span>
+          <span aria-hidden="true" style="color:var(--border);">|</span>
+          <span class="issue-chip ${issue.issueType}">${issue.issueLabel}</span>
+        </div>
+        </div>
+      </div>
+
+      
+      <table class="issue-table" role="table" aria-label="Issue details for record ${issue.id}">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            ${issue.columns.map((col, ci) => `
+              <th scope="col">
+                <span>${col}</span>
+                ${ci === issueColIdx ? `
+                  <span class="tooltip-trigger" style="margin-left:2px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#795548"><path d="M12 2A10 10 0 0 1 22 12A10 10 0 0 1 12 22A10 10 0 0 1 2 12A10 10 0 0 1 12 2M9 7V17H11V13H13V17H15V7H13V11H11V7H9Z"/></svg>
+                    <span class="tooltip-content" role="tooltip">This field has a formatting issue</span>
+                  </span>
+                ` : ''}
+              </th>
+            `).join('')}
+            <th scope="col">sfid</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr data-row-type="original">
+            <td>
+              <div class="row-label">
+                <span>Original</span>
+              </div>
+            </td>
+            ${issue.original.map((val, ci) => {
+              const isIssue = ci === issueColIdx;
+              return `<td class="${isIssue ? 'cell-issue' : ''}">
+                ${isIssue ? `
+                  <label class="cell-radio">
+                    <input type="radio"
+                      name="choice-${issue.id}"
+                      value="original"
+                      ${issue.selectedRow === 'original' ? 'checked' : ''}
+                      aria-label="Select original value: ${val}">
+                    <span>${val || '—'}</span>
+                  </label>
+                ` : `<span>${val || '—'}</span>`}
+              </td>`;
+            }).join('')}
+            <td><span style="font-size:11px;color:var(--text-secondary);">${issue.id}</span></td>
+          </tr>
+
+          
+          <tr data-row-type="suggested">
+            <td>
+              <div class="row-label">Suggested</div>
+            </td>
+            ${issue.suggested.map((val, ci) => {
+              const isIssue = ci === issueColIdx;
+              return `<td class="${isIssue ? 'cell-issue' : ''}">
+                ${isIssue ? `
+                  <label class="cell-radio">
+                    <input type="radio"
+                      name="choice-${issue.id}"
+                      value="suggested"
+                      ${issue.selectedRow === 'suggested' ? 'checked' : ''}
+                      aria-label="Select suggested value: ${val}">
+                    <span>${val || '—'}</span>
+                  </label>
+                ` : `<span>${val || '—'}</span>`}
+              </td>`;
+            }).join('')}
+            <td><span style="font-size:11px;color:var(--text-secondary);">${issue.id}</span></td>
+          </tr>
+
+          
+          <tr data-row-type="final">
+            <td>
+              <div class="row-label">Final</div>
+            </td>
+            ${issue.final.map((val, ci) => {
+              const isIssue = ci === issueColIdx;
+              return `<td>
+                ${isIssue ? `
+                  <div class="cell-editable" data-field="${issue.columns[ci]}" data-record="${issue.id}" tabindex="0" role="button" aria-label="Edit final value for ${issue.columns[ci]}">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.39-.39-1.04-.39-1.41 0l-1.84 1.83 3.75 3.75 1.84-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+                    <span>${val || '—'}</span>
+                  </div>
+                ` : `<span>${val || '—'}</span>`}
+              </td>`;
+            }).join('')}
+            <td><span style="font-size:11px;color:var(--text-secondary);">${issue.id}</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+    `;
+
+    container.appendChild(card);
+  });
+
+  attachCardListeners();
+}
+
+function attachCardListeners() {
+
+  document.querySelectorAll('.issue-checkbox').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const id = e.target.dataset.issueId;
+      if (e.target.checked) {
+        selectedIssues.add(id);
+      } else {
+        selectedIssues.delete(id);
+      }
+      updateConfirmBar();
+    });
+  });
+
+  document.getElementById('selectAll').addEventListener('change', (e) => {
+    const checked = e.target.checked;
+    document.querySelectorAll('.issue-checkbox').forEach(cb => {
+      cb.checked = checked;
+      const id = cb.dataset.issueId;
+      if (checked) selectedIssues.add(id);
+      else selectedIssues.delete(id);
+    });
+    updateConfirmBar();
+  });
+
+  document.querySelectorAll('.cell-editable').forEach(cell => {
+    cell.addEventListener('click', () => {
+      if (cell.querySelector('input') || cell.querySelector('.cell-spinner')) return;
+      const span = cell.querySelector('span');
+      const svgEl = cell.querySelector('svg');
+      const currentVal = span.textContent;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = currentVal === '—' ? '' : currentVal;
+      input.className = 'inline-edit-input';
+      input.setAttribute('aria-label', `Edit ${cell.dataset.field} for ${cell.dataset.record}`);
+      span.style.display = 'none';
+      svgEl.style.display = 'none';
+      cell.appendChild(input);
+      input.focus();
+
+      let saving = false;
+      function saveEdit() {
+        if (saving) return;
+        saving = true;
+        const newVal = input.value || '—';
+        input.remove();
+        cell.innerHTML = '<div class="cell-spinner">Saving...</div>';
+        setTimeout(() => {
+          cell.innerHTML = '';
+          const newSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+          newSvg.setAttribute('viewBox', '0 0 24 24');
+          newSvg.setAttribute('fill', 'currentColor');
+          newSvg.innerHTML = '<path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.39-.39-1.04-.39-1.41 0l-1.84 1.83 3.75 3.75 1.84-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>';
+          cell.appendChild(newSvg);
+          const newSpan = document.createElement('span');
+          newSpan.textContent = newVal;
+          cell.appendChild(newSpan);
+        }, randomDelay(500, 1000));
+      }
+
+      input.addEventListener('blur', saveEdit);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        if (e.key === 'Escape') {
+          input.value = currentVal;
+          input.blur();
+        }
+      });
+    });
+  });
+
+  document.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const name = e.target.name;
+      const recordId = name.replace('choice-', '');
+      const issue = MOCK_DATA.find(d => d.id === recordId);
+      if (!issue) return;
+      const val = e.target.value;
+      const issueColIdx = issue.columns.indexOf(issue.issueColumn);
+      const newVal = val === 'original' ? issue.original[issueColIdx] : issue.suggested[issueColIdx];
+
+      const card = document.querySelector(`[data-record-id="${recordId}"]`);
+      const finalRow = card.querySelector('tr[data-row-type="final"]');
+      const editableCell = finalRow.querySelector('.cell-editable');
+      if (editableCell) {
+        const prevHTML = showCellSpinner(editableCell);
+        setTimeout(() => {
+          editableCell.innerHTML = prevHTML;
+          editableCell.querySelector('span').textContent = newVal || '—';
+        }, randomDelay(500, 1000));
+      }
+    });
+  });
+}
+
+function updateConfirmBar() {
+  const bar = document.getElementById('confirmBar');
+  const count = selectedIssues.size;
+  document.getElementById('selectedCount').textContent = count;
+  if (count > 0) {
+    bar.classList.add('visible');
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+
+  const current = document.getElementById('breadcrumb-current');
+  if (pageId === 'page-home') {
+    current.textContent = 'Dashboard';
+  } else {
+    current.textContent = 'Data Issues';
+  }
+}
+
+function randomDelay(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function showCellSpinner(cell) {
+  const prev = cell.innerHTML;
+  cell.innerHTML = '<div class="cell-spinner">Saving...</div>';
+  return prev;
+}
+
+document.getElementById('solveBtn').addEventListener('click', () => {
+  showPage('page-issues');
+  const container = document.getElementById('issueCardsContainer');
+  container.innerHTML = '<div class="grid-loading"><div class="grid-loading-spinner"></div><div class="grid-loading-text">Loading issues...</div></div>';
+  setTimeout(() => {
+    renderIssueCards();
+  }, randomDelay(500, 5000));
+});
+
+document.getElementById('nav-home').addEventListener('click', (e) => {
+  e.preventDefault();
+  showPage('page-home');
+});
+
+</script>
+
+</body>
+</html>
